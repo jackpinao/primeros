@@ -27,7 +27,7 @@ public class Uso_Empleado {
 		jefe_RRHH.estableceIncentivo(2570);
 		
 		
-		Empleado2[] misEmpleados = new Empleado2[5];
+		/*Empleado2[] misEmpleados = new Empleado2[5];
 		misEmpleados[0]= new Empleado2("Paco gomes", 85000, 1990, 12, 17);
 		
 		misEmpleados[1]= new Empleado2("Ana Lopez", 95000, 1995, 06, 02);
@@ -36,7 +36,39 @@ public class Uso_Empleado {
 		
 		misEmpleados[3] = jefe_RRHH; //poliformismo en accion. principio de sustitucion.
 		
+		misEmpleados[4] = new Jefatura("maria", 95000, 1999, 5, 26);*/
+		
+		Empleado[] misEmpleados = new Empleado[5];
+		misEmpleados[0]= new Empleado("Paco gomes", 85000, 1990, 12, 17);
+		
+		misEmpleados[1]= new Empleado("Ana Lopez", 95000, 1995, 06, 02);
+		
+		misEmpleados[2] = new Empleado("Maria Martin", 105000, 2002, 03, 15);
+		
+		misEmpleados[3] = jefe_RRHH; //poliformismo en accion. principio de sustitucion.
+		
 		misEmpleados[4] = new Jefatura("maria", 95000, 1999, 5, 26);
+		
+		Jefatura jefa_finanzas = (Jefatura) misEmpleados[4];
+		jefa_finanzas.estableceIncentivo(55000);
+		
+		System.out.println(jefa_finanzas.tomar_decisiones("aumentar los dias de vacaciones"));
+		
+		System.out.println("El jefe "+jefa_finanzas.dameNombre()+" tiene un bonus de: "+jefa_finanzas.establece_bonus(500));
+		
+		System.out.println(misEmpleados[3].dameNombre()+" tiene un bonus de: "+misEmpleados[3].establece_bonus(200));
+		
+		//Ejmplo de uso de instanceoff
+		/*Empleado Director_comercial = new Jefatura("Julia", 85000, 2012, 05, 05);
+		Comparable ejemplo = new Empleado("Sandra", 45000, 2011, 06, 04);
+		
+		if (Director_comercial instanceof Empleado) {
+			System.out.println("Es de tipo jefatura");
+		}
+		if (ejemplo instanceof Comparable ) {
+			System.out.println("Implementa la interface comparable");
+		}*/
+		
 		
 		/*for(int i=0;i<3;i++) {
 			misEmpleados[i].subeSueldo(5);
@@ -49,11 +81,15 @@ public class Uso_Empleado {
 		
 		/////////////////////////////////////////////////
 		
-		for(Empleado2 e: misEmpleados) {
+		
+		for(Empleado e: misEmpleados) {
 			e.subeSueldo(5);
 		}
 		
-		for(Empleado2 e: misEmpleados) {
+		
+		Arrays.sort(misEmpleados);
+		
+		for(Empleado e: misEmpleados) {
 			System.out.println("nombre : "+e.dameNombre()+
 					" sueldo: "+e.dameSueldo()+
 					" fecha de alta: "+e.dameFechaContrato());
@@ -63,18 +99,23 @@ public class Uso_Empleado {
 
 }
 
-class Empleado{
+class Empleado implements Comparable, Trabajadores {
 	public Empleado(String nom, double sue, int anio, int mes, int dia) {
 		nombre= nom;
 		sueldo= sue;
 		GregorianCalendar calendario = new GregorianCalendar(anio, mes-1, dia);
 		altaContrato = calendario.getTime();
+		++IdSiguiente;
+		Id=IdSiguiente;
 	}
 	
-	
+	public double establece_bonus(double gratificacion) {
+		
+		return Trabajadores.bonus_base+gratificacion;
+	}
 	
 	public String dameNombre() {//getter
-		return nombre;
+		return nombre +" Id: "+ Id;
 	}
 	
 	public double dameSueldo() {//getter
@@ -90,18 +131,38 @@ class Empleado{
 		sueldo+=aumento;
 	}
 	
+	public int compareTo(Object miObjeto) {
+		Empleado otroEmpleado = (Empleado) miObjeto;
+		if(this.Id<otroEmpleado.Id) {
+			return -1;
+		}
+		if(this.Id>otroEmpleado.Id) {
+			return 1;
+		}
+		return 0;
+	}
+	
 	private String nombre;
 	private double sueldo;
 	private Date altaContrato;
-	private static int idSiguiente;
-	private int id;
+	private static int IdSiguiente;
+	private int Id;
 }
 
 
-class Jefatura extends Empleado2{
+class Jefatura extends Empleado implements Jefes{
 	
 	public Jefatura(String nom, double sue, int anio, int mes, int dia) {
 		super(nom, sue, anio, mes, dia);
+	}
+	
+	public String tomar_decisiones(String decision) {
+		return "un miembro de la direccion ha tomado la decision de: "+decision; 
+	}
+	
+	public double establece_bonus(double gratificacion) {
+		double prima = 2000;
+		return Trabajadores.bonus_base+gratificacion+prima;
 	}
 	
 	public void estableceIncentivo(double b) {
